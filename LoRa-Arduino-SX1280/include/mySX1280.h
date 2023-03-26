@@ -9,7 +9,7 @@ uint8_t buff[] = "Hello World 1234567890";
 class mySX1280{
     public:
     void setup(void);
-    void transmit(uint8_t message[]);
+    void transmit(uint8_t message[], uint16_t messageSize);
     void led_Flash(uint8_t flashes, uint16_t delaymS);
     void transmit_is_OK(void);
     void transmit_is_Error(void);
@@ -103,13 +103,13 @@ void mySX1280::led_Flash(uint8_t flashes, uint16_t delaymS)
 }
 
 // Call in main.cpp and feed in message
-void mySX1280::transmit(uint8_t message[]){ 
+void mySX1280::transmit(uint8_t message[], uint16_t messageSize){ 
   Serial.print(TXpower);                                       //print the transmit power defined
   Serial.print(F("dBm "));
   Serial.print(F("Packet> "));
   Serial.flush();
 
-  TXPacketL = sizeof(message);                                    //set TXPacketL to length of array
+  TXPacketL = messageSize;                                    //set TXPacketL to length of array
   message[TXPacketL - 1] = '*';                                   //replace null character at buffer end so its visible on reciver
 
   LT.printASCIIPacket(message, TXPacketL);                        //print the buffer (the sent packet) as ASCII
