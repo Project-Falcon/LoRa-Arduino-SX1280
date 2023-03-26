@@ -1,28 +1,37 @@
 #define Program_Version "V1.0"
 
-#include <SPI.h>                                 //the lora device is SPI based so load the SPI library
-#include <SX128XLT.h>                            //include the appropriate library   
-#include "Settings.h" 
+#include <SPI.h>      //the lora device is SPI based so load the SPI library
+#include <SX128XLT.h> //include the appropriate library
+#include "Settings.h"
 
 uint8_t buff[] = "Hello World 1234567890";
 
-class mySX1280{
-    public:
-    void setup(void);
-    void transmit(uint8_t message[], uint16_t messageSize);
-    void led_Flash(uint8_t flashes, uint16_t delaymS);
-    void transmit_is_OK(void);
-    void transmit_is_Error(void);
+class mySX1280
+{
+public:
+  void setup(void);
+  void transmit(uint8_t message[], uint16_t messageSize);
+  void led_Flash(uint8_t flashes, uint16_t delaymS);
+  void transmit_is_OK(void);
+  void transmit_is_Error(void);
+  void receive();
+  void packet_is_OK();
+  void packet_is_Error();
+  void printElapsedTime();
 
-    private:
-    SX128XLT LT;                                                   //create a library class instance called LT
+private:
+  SX128XLT LT; // create a library class instance called LT
 
-    uint8_t TXPacketL;
-    uint32_t TXPacketCount, startmS, endmS;
-    
+  uint8_t TXPacketL, RXBUFFER[RXBUFFER_SIZE], RXPacketL, PacketSNR;
+  uint16_t PacketRSSI;
+  uint32_t TXPacketCount, RXPacketCount, startmS, endmS, errors;
 };
 
-void mySX1280::setup(void){
+void mySX1280::setup(void)
+{
+  pinMode(LED1, OUTPUT);
+  led_Flash(2, 125);
+
   Serial.begin(9600);
   Serial.println();
   Serial.print(F(__TIME__));
@@ -35,11 +44,11 @@ void mySX1280::setup(void){
 
   SPI.begin();
 
-  //SPI beginTranscation is normally part of library routines, but if it is disabled in the library
-  //a single instance is needed here, so uncomment the program line below
-  //SPI.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
+  // SPI beginTranscation is normally part of library routines, but if it is disabled in the library
+  // a single instance is needed here, so uncomment the program line below
+  // SPI.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
 
-  //setup hardware pins used by device, then check if device is found
+  // setup hardware pins used by device, then check if device is found
   if (LT.begin(NSS, NRESET, RFBUSY, DIO1, DIO2, DIO3, RX_EN, TX_EN, LORA_DEVICE))
   {
     Serial.println(F("LoRa Device found"));
@@ -51,17 +60,17 @@ void mySX1280::setup(void){
     Serial.println(F("No device responding"));
     while (1)
     {
-      led_Flash(50, 50);                                       //long fast speed LED flash indicates device error
+      led_Flash(50, 50); // long fast speed LED flash indicates device error
     }
   }
 
-  //The function call list below shows the complete setup for the LoRa device using the information defined in the
-  //Settings.h file.
-  //The 'Setup LoRa device' list below can be replaced with a single function call;
-  //LT.setupLoRa(Frequency, Offset, SpreadingFactor, Bandwidth, CodeRate);
+  // The function call list below shows the complete setup for the LoRa device using the information defined in the
+  // Settings.h file.
+  // The 'Setup LoRa device' list below can be replaced with a single function call;
+  // LT.setupLoRa(Frequency, Offset, SpreadingFactor, Bandwidth, CodeRate);
 
   //***************************************************************************************************
-  //Setup LoRa device
+  // Setup LoRa device
   //***************************************************************************************************
   LT.setMode(MODE_STDBY_RC);
   LT.setRegulatorMode(USE_LDO);
@@ -72,17 +81,16 @@ void mySX1280::setup(void){
   LT.setPacketParams(12, LORA_PACKET_VARIABLE_LENGTH, 255, LORA_CRC_ON, LORA_IQ_NORMAL, 0, 0);
   LT.setDioIrqParams(IRQ_RADIO_ALL, (IRQ_TX_DONE + IRQ_RX_TX_TIMEOUT), 0, 0);
   LT.setHighSensitivity();
-  //LT.setLowPowerRX();
+  // LT.setLowPowerRX();
   //***************************************************************************************************
 
-
   Serial.println();
-  LT.printModemSettings();                                     //reads and prints the configured LoRa settings, useful check
+  LT.printModemSettings(); // reads and prints the configured LoRa settings, useful check
   Serial.println();
-  LT.printOperatingSettings();                                 //reads and prints the configured operting settings, useful check
+  LT.printOperatingSettings(); // reads and prints the configured operting settings, useful check
   Serial.println();
   Serial.println();
-  LT.printRegisters(0x900, 0x9FF);                             //print contents of device registers
+  LT.printRegisters(0x900, 0x9FF); // print contents of device registers
   Serial.println();
   Serial.println();
 
@@ -103,58 +111,159 @@ void mySX1280::led_Flash(uint8_t flashes, uint16_t delaymS)
 }
 
 // Call in main.cpp and feed in message
-void mySX1280::transmit(uint8_t message[], uint16_t messageSize){ 
-  Serial.print(TXpower);                                       //print the transmit power defined
+void mySX1280::transmit(uint8_t message[], uint16_t messageSize)
+{
+  Serial.print(TXpower); // print the transmit power defined
   Serial.print(F("dBm "));
   Serial.print(F("Packet> "));
   Serial.flush();
 
-  TXPacketL = messageSize;                                    //set TXPacketL to length of array
-  message[TXPacketL - 1] = '*';                                   //replace null character at buffer end so its visible on reciver
+  TXPacketL = messageSize;      // set TXPacketL to length of array
+  message[TXPacketL - 1] = '*'; // replace null character at buffer end so its visible on reciver
 
-  LT.printASCIIPacket(message, TXPacketL);                        //print the buffer (the sent packet) as ASCII
+  LT.printASCIIPacket(message, TXPacketL); // print the buffer (the sent packet) as ASCII
 
   digitalWrite(LED1, HIGH);
-  startmS =  millis();                                         //start transmit timer
-  if (LT.transmit(message, TXPacketL, 10000, TXpower, WAIT_TX))   //will return packet length sent if OK, otherwise 0 if transmit, timeout 10 seconds
+  startmS = millis();                                           // start transmit timer
+  if (LT.transmit(message, TXPacketL, 10000, TXpower, WAIT_TX)) // will return packet length sent if OK, otherwise 0 if transmit, timeout 10 seconds
   {
-    endmS = millis();                                          //packet sent, note end time
+    endmS = millis(); // packet sent, note end time
     TXPacketCount++;
     transmit_is_OK();
   }
   else
   {
-    transmit_is_Error();                                 //transmit packet returned 0, there was an error
+    transmit_is_Error(); // transmit packet returned 0, there was an error
   }
 
   digitalWrite(LED1, LOW);
   Serial.println();
-  delay(packet_delay);                
+  delay(packet_delay);
 }
 
-void mySX1280::transmit_is_Error(void){
+void mySX1280::transmit_is_Error(void)
+{
   uint16_t IRQStatus;
-  IRQStatus = LT.readIrqStatus();                  //read the the interrupt register
+  IRQStatus = LT.readIrqStatus(); // read the the interrupt register
   Serial.print(F(" SendError,"));
   Serial.print(F("Length,"));
-  Serial.print(TXPacketL);                         //print transmitted packet length
+  Serial.print(TXPacketL); // print transmitted packet length
   Serial.print(F(",IRQreg,"));
-  Serial.print(IRQStatus, HEX);                    //print IRQ status
+  Serial.print(IRQStatus, HEX); // print IRQ status
   LT.printIrqStatus();
 }
 
-void mySX1280::transmit_is_OK(void){
-  //if here packet has been sent OK
+void mySX1280::transmit_is_OK(void)
+{
+  // if here packet has been sent OK
   uint16_t localCRC;
 
   Serial.print(F("  BytesSent,"));
-  Serial.print(TXPacketL);                             //print transmitted packet length
+  Serial.print(TXPacketL); // print transmitted packet length
   localCRC = LT.CRCCCITT(buff, TXPacketL, 0xFFFF);
   Serial.print(F("  CRC,"));
-  Serial.print(localCRC, HEX);                              //print CRC of sent packet
+  Serial.print(localCRC, HEX); // print CRC of sent packet
   Serial.print(F("  TransmitTime,"));
-  Serial.print(endmS - startmS);                       //print transmit time of packet
+  Serial.print(endmS - startmS); // print transmit time of packet
   Serial.print(F("mS"));
   Serial.print(F("  PacketsSent,"));
-  Serial.print(TXPacketCount);     
+  Serial.print(TXPacketCount);
+}
+
+void mySX1280::receive()
+{
+  while (true)
+  {
+    RXPacketL = LT.receive(RXBUFFER, RXBUFFER_SIZE, 60000, WAIT_RX); // wait for a packet to arrive with 60seconds (60000mS) timeout
+
+    digitalWrite(LED1, HIGH); // something has happened
+
+    PacketRSSI = LT.readPacketRSSI(); // read the recived RSSI value
+    PacketSNR = LT.readPacketSNR();   // read the received SNR value
+
+    if (RXPacketL == 0) // if the LT.receive() function detects an error, RXpacketL == 0
+    {
+      packet_is_Error();
+    }
+    else
+    {
+      packet_is_OK();
+    }
+
+    digitalWrite(LED1, LOW); // LED off
+
+    Serial.println();
+  }
+}
+
+void mySX1280::packet_is_OK()
+{
+  // packet received is OK
+
+  uint16_t IRQStatus, localCRC;
+
+  IRQStatus = LT.readIrqStatus(); // read the LoRa device IRQ status register
+
+  RXPacketCount++;
+
+  printElapsedTime(); // print elapsed time to Serial Monitor
+  Serial.print(F("  "));
+  LT.printASCIIPacket(RXBUFFER, RXPacketL); // print the packet as ASCII characters
+
+  localCRC = LT.CRCCCITT(RXBUFFER, RXPacketL, 0xFFFF); // calculate the CRC, this is the external CRC calculation of the RXBUFFER
+  Serial.print(F(",CRC,"));                            // contents, not the LoRa device internal CRC
+  Serial.print(localCRC, HEX);
+  Serial.print(F(",RSSI,"));
+  Serial.print(PacketRSSI);
+  Serial.print(F("dBm,SNR,"));
+  Serial.print(PacketSNR);
+  Serial.print(F("dB,Length,"));
+  Serial.print(RXPacketL);
+  Serial.print(F(",Packets,"));
+  Serial.print(RXPacketCount);
+  Serial.print(F(",Errors,"));
+  Serial.print(errors);
+  Serial.print(F(",IRQreg,"));
+  Serial.print(IRQStatus, HEX);
+}
+
+void mySX1280::packet_is_Error()
+{
+  uint16_t IRQStatus;
+  IRQStatus = LT.readIrqStatus(); // read the LoRa device IRQ status register
+
+  printElapsedTime(); // print elapsed time to Serial Monitor
+
+  if (IRQStatus & IRQ_RX_TIMEOUT) // check for an RX timeout
+  {
+    Serial.print(F(" RXTimeout"));
+  }
+  else
+  {
+    errors++;
+    Serial.print(F(" PacketError"));
+    Serial.print(F(",RSSI,"));
+    Serial.print(PacketRSSI);
+    Serial.print(F("dBm,SNR,"));
+    Serial.print(PacketSNR);
+    Serial.print(F("dB,Length,"));
+    Serial.print(LT.readRXPacketL()); // get the real packet length
+    Serial.print(F(",Packets,"));
+    Serial.print(RXPacketCount);
+    Serial.print(F(",Errors,"));
+    Serial.print(errors);
+    Serial.print(F(",IRQreg,"));
+    Serial.print(IRQStatus, HEX);
+    LT.printIrqStatus(); // print the names of the IRQ registers set
+  }
+
+  delay(250); // gives a longer buzzer and LED flash for error
+}
+
+void mySX1280::printElapsedTime()
+{
+  float seconds;
+  seconds = millis() / 1000;
+  Serial.print(seconds, 0);
+  Serial.print(F("s"));
 }
