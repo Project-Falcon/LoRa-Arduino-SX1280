@@ -4,16 +4,17 @@
 
 RegisterTest myRegister;
 
-mySX1280 myLora; //Uncomment to test transmission
-// uint8_t message[] = "Aamir benches more than Kush"; //Uncomment to test transmission
+mySX1280 myLora;
+uint8_t message[] = "Aamir benches more than Kush";
 
 
 void setup(){
   Serial.begin(9600);
-  // myRegister.setup(); // Comment during transmission test
-  myLora.setup(); //Uncomment to test transmission
+  // myRegister.setup();
+  myLora.Setup();
 }
 void loop(){
-  // myRegister.loop(); // Comment during transmission test
-  myLora.receive(); //Uncomment to test transmission
+  // myRegister.loop();
+  // myLora.Receive();
+  myLora.Transmit(message, sizeof(message));
 }
