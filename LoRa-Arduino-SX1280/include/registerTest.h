@@ -78,8 +78,6 @@ public:
     uint8_t readRegister(uint16_t address);
     void writeRegisters(uint16_t address, uint8_t *buffer, uint16_t size);
     void writeRegister(uint16_t address, uint8_t value);
-    void writeRegisters(uint16_t address, uint8_t *buffer, uint16_t size);
-    void writeRegister(uint16_t address, uint8_t value);
     uint32_t getFreqInt();
     void printRegisters(uint16_t Start, uint16_t End);
     void setRfFrequency(uint32_t frequency, int32_t offset);
