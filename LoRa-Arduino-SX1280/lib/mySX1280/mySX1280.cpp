@@ -1,31 +1,12 @@
 #define Program_Version "V1.0"
 
 #include <SPI.h>
-#include <SX128XLT.h>
+#include "mySX1280.h"
 #include "Settings.h"
 
-uint8_t buff[] = "Hello World 1234567890";
+uint8_t buff[] = "Hello World 1234567890"; // TODO: What is this used for?
 
-class mySX1280
-{
-public:
-  void Setup();
-  void Transmit(uint8_t message[], uint16_t message_size);
-  void LedFlash(uint8_t flashes, uint16_t delay_ms);
-  void TransmitIsOK();
-  void TransmitIsError();
-  void Receive();
-  void ReceivePacketIsOK();
-  void ReceivePacketIsError();
-  void PrintElapsedTime();
-
-private:
-  SX128XLT lora;
-
-  uint8_t tx_packet_length, rx_buffer[RXBUFFER_SIZE], rx_packet_length, packet_snr;
-  uint16_t packet_rssi;
-  uint32_t tx_packet_count, rx_packet_count, start_ms, end_ms, error_count;
-};
+mySX1280::mySX1280() {}
 
 void mySX1280::Setup()
 {
@@ -75,17 +56,6 @@ void mySX1280::Setup()
   // Serial.print(F("Receiver ready - RXBUFFER_SIZE "));
   // Serial.println(RXBUFFER_SIZE);
   // Serial.println();
-}
-
-void mySX1280::LedFlash(uint8_t flashes, uint16_t delay_ms)
-{
-  for (uint8_t i = 0; i < flashes; i++)
-  {
-    digitalWrite(LED1, HIGH);
-    delay(delay_ms);
-    digitalWrite(LED1, LOW);
-    delay(delay_ms);
-  }
 }
 
 void mySX1280::Transmit(uint8_t message[], uint16_t message_size)
@@ -232,6 +202,17 @@ void mySX1280::ReceivePacketIsError()
   }
 
   delay(250);
+}
+
+void mySX1280::LedFlash(uint8_t flashes, uint16_t delay_ms)
+{
+  for (uint8_t i = 0; i < flashes; i++)
+  {
+    digitalWrite(LED1, HIGH);
+    delay(delay_ms);
+    digitalWrite(LED1, LOW);
+    delay(delay_ms);
+  }
 }
 
 void mySX1280::PrintElapsedTime()
