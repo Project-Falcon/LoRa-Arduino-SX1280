@@ -12,6 +12,9 @@
 //DIO3, BUZZER may not be in used by this sketch so they do not need to be
 //connected and should be set to -1.
 
+#include <stdint.h>
+#include <SX128XLT_Definitions.h>
+
 #define NSS 10
 #define RFBUSY 7
 #define NRESET 9
