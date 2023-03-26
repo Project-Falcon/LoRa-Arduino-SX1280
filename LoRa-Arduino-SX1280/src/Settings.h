@@ -13,7 +13,6 @@
 //connected and should be set to -1.
 
 #include <stdint.h>
-#include <SX128XLT_Definitions.h>
 
 #define NSS 10
 #define RFBUSY 7
@@ -38,3 +37,5 @@ const uint8_t CodeRate = LORA_CR_4_5;            //LoRa coding rate
 const int8_t TXpower = 10;                       //Power for transmissions in dBm
 
 const uint16_t packet_delay = 1000;              //mS delay between packets
+
+#define RXBUFFER_SIZE 255                        //RX buffer size  
