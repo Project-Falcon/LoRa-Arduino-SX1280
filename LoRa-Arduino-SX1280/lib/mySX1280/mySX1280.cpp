@@ -147,6 +147,7 @@ void mySX1280::Receive()
     digitalWrite(LED1, LOW);
 
     // Serial.println();
+    break;
   }
 }
 
