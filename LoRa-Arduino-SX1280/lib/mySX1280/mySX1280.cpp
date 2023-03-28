@@ -93,7 +93,6 @@ void mySX1280::Transmit(uint8_t message[], uint16_t message_size)
 
   digitalWrite(LED1, LOW);
   Serial.println();
-  delay(packet_delay);
 }
 
 void mySX1280::TransmitIsError()
@@ -126,29 +125,23 @@ void mySX1280::TransmitIsOK()
 
 void mySX1280::Receive()
 {
-  while (true)
+  rx_packet_length = lora.receive(rx_buffer, RXBUFFER_SIZE, 200, 1); // wait for a packet to arrive with 60seconds (60000mS) timeout
+
+  digitalWrite(LED1, HIGH);
+
+  packet_rssi = lora.readPacketRSSI();
+  packet_snr = lora.readPacketSNR();
+
+  if (rx_packet_length == 0) // if the lora.receive() function detects an error, rx_packet_length == 0
   {
-    rx_packet_length = lora.receive(rx_buffer, RXBUFFER_SIZE, 100, 0); // wait for a packet to arrive with 60seconds (60000mS) timeout
-
-    digitalWrite(LED1, HIGH);
-
-    packet_rssi = lora.readPacketRSSI();
-    packet_snr = lora.readPacketSNR();
-
-    if (rx_packet_length == 0) // if the lora.receive() function detects an error, rx_packet_length == 0
-    {
-      // ReceivePacketIsError();
-    }
-    else
-    {
-      ReceivePacketIsOK();
-    }
-
-    digitalWrite(LED1, LOW);
-
-    // Serial.println();
-    break;
+    ReceivePacketIsError();
   }
+  else
+  {
+    ReceivePacketIsOK();
+  }
+
+  digitalWrite(LED1, LOW);
 }
 
 void mySX1280::ReceivePacketIsOK()
@@ -178,6 +171,7 @@ void mySX1280::ReceivePacketIsOK()
   Serial.print(error_count);
   Serial.print(F(",IRQreg,"));
   Serial.print(irq_status, HEX);
+  Serial.println();
 }
 
 void mySX1280::ReceivePacketIsError()

@@ -13,13 +13,11 @@ unsigned short int mode; // 0 is receiving and 1 is transmitting
 
 void receive()
 {
-  // Serial.println("1");
   myLora.Receive();
 }
 
 void transmit()
 {
-  // Serial.println("2");
   myLora.Transmit(message, sizeof(message));
 }
 
@@ -59,7 +57,7 @@ void setup()
   transmitting_thread.onRun(transmit);
   transmitting_thread.setInterval(1000);
   receiving_thread.onRun(receive);
-  receiving_thread.setInterval(100);
+
   control.add(&receiving_thread);    // & to pass the pointer to it
   control.add(&transmitting_thread); // & to pass the pointer to it
 }
@@ -67,4 +65,5 @@ void setup()
 void loop()
 {
   control.run();
+  delay(10);
 }
