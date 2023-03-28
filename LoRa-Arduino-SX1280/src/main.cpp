@@ -4,6 +4,7 @@
 mySX1280 myLora;
 uint8_t message[] = "Aamir benches more than Kush";
 unsigned short int mode; // 0 is receiving and 1 is transmitting
+
 void setup()
 {
   Serial.begin(9600);
@@ -34,6 +35,8 @@ void setup()
     }
   Serial.println();
   myLora.Setup();
+  Serial.println();
+  myLora.UpdateSettings(160, 10, 4);
 }
 void loop()
 {

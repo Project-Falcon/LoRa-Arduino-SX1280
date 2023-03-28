@@ -58,6 +58,13 @@ void mySX1280::Setup()
   // Serial.println();
 }
 
+void mySX1280::UpdateSettings(uint8_t new_spreading_factor, uint8_t new_bandwidth, uint8_t new_code_rate){
+  lora.setupLoRa(frequency, offset, new_spreading_factor, new_bandwidth, new_code_rate);
+  Serial.println();
+  lora.printModemSettings();
+  Serial.println();
+}
+
 void mySX1280::Transmit(uint8_t message[], uint16_t message_size)
 {
   Serial.print(tx_power);
