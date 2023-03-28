@@ -58,7 +58,8 @@ void mySX1280::Setup()
   // Serial.println();
 }
 
-void mySX1280::UpdateSettings(uint8_t new_spreading_factor, uint8_t new_bandwidth, uint8_t new_code_rate){
+void mySX1280::UpdateSettings(uint8_t new_spreading_factor, uint8_t new_bandwidth, uint8_t new_code_rate)
+{
   lora.setupLoRa(frequency, offset, new_spreading_factor, new_bandwidth, new_code_rate);
   Serial.println();
   lora.printModemSettings();
@@ -127,7 +128,7 @@ void mySX1280::Receive()
 {
   while (true)
   {
-    rx_packet_length = lora.receive(rx_buffer, RXBUFFER_SIZE, 60000, WAIT_RX); // wait for a packet to arrive with 60seconds (60000mS) timeout
+    rx_packet_length = lora.receive(rx_buffer, RXBUFFER_SIZE, 50, 0); // wait for a packet to arrive with 60seconds (60000mS) timeout
 
     digitalWrite(LED1, HIGH);
 
@@ -136,7 +137,7 @@ void mySX1280::Receive()
 
     if (rx_packet_length == 0) // if the lora.receive() function detects an error, rx_packet_length == 0
     {
-      ReceivePacketIsError();
+      // ReceivePacketIsError();
     }
     else
     {
@@ -145,7 +146,7 @@ void mySX1280::Receive()
 
     digitalWrite(LED1, LOW);
 
-    Serial.println();
+    // Serial.println();
   }
 }
 
@@ -208,7 +209,7 @@ void mySX1280::ReceivePacketIsError()
     lora.printIrqStatus(); // print the names of the IRQ registers set
   }
 
-  delay(250);
+  // delay(250);
 }
 
 void mySX1280::LedFlash(uint8_t flashes, uint16_t delay_ms)

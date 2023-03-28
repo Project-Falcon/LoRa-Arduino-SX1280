@@ -1,9 +1,27 @@
 #include <Arduino.h>
 #include <mySX1280.h>
+#include <Thread.h>
+#include <ThreadController.h>
+
+ThreadController control = ThreadController();
+Thread receiving_thread = Thread();
+Thread transmitting_thread = Thread();
 
 mySX1280 myLora;
 uint8_t message[] = "Aamir benches more than Kush";
 unsigned short int mode; // 0 is receiving and 1 is transmitting
+
+void receive()
+{
+  // Serial.println("1");
+  myLora.Receive();
+}
+
+void transmit()
+{
+  // Serial.println("2");
+  myLora.Transmit(message, sizeof(message));
+}
 
 void setup()
 {
@@ -32,20 +50,20 @@ void setup()
         Serial.println("Enter a mode (0=receiving, 1=transmitting): ");
       }
     }
-    }
+  }
   Serial.println();
   myLora.Setup();
   Serial.println();
   myLora.UpdateSettings(160, 10, 4);
+  transmitting_thread.onRun(transmit);
+  transmitting_thread.setInterval(1000);
+  receiving_thread.onRun(receive);
+  receiving_thread.setInterval(100);
+  control.add(&transmitting_thread); // & to pass the pointer to it
+  control.add(&receiving_thread);    // & to pass the pointer to it
 }
+
 void loop()
 {
-  if (mode == 0)
-  { // If Receiving
-    myLora.Receive();
-  }
-  else if (mode == 1)
-  { // If Transmitting
-    myLora.Transmit(message, sizeof(message));
-  }
+  control.run();
 }
