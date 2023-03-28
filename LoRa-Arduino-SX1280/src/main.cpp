@@ -55,7 +55,7 @@ void setup()
   myLora.UpdateSettings(160, 10, 4);
 
   transmitting_thread.onRun(transmit);
-  transmitting_thread.setInterval(1000);
+  transmitting_thread.setInterval(100);
   receiving_thread.onRun(receive);
 
   control.add(&receiving_thread);    // & to pass the pointer to it
