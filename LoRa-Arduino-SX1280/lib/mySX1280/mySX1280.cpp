@@ -183,7 +183,7 @@ void mySX1280::ReceivePacketIsError()
 
   if (irq_status & IRQ_RX_TIMEOUT) // check for an RX timeout
   {
-    Serial.print(F(" RXTimeout"));
+    // Serial.print(F(" RXTimeout"));
   }
   else
   {
