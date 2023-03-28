@@ -179,14 +179,13 @@ void mySX1280::ReceivePacketIsError()
   uint16_t irq_status;
   irq_status = lora.readIrqStatus();
 
-  PrintElapsedTime();
-
   if (irq_status & IRQ_RX_TIMEOUT) // check for an RX timeout
   {
     // Serial.print(F(" RXTimeout"));
   }
   else
   {
+    PrintElapsedTime();
     error_count++;
     Serial.print(F(" PacketError"));
     Serial.print(F(",RSSI,"));
