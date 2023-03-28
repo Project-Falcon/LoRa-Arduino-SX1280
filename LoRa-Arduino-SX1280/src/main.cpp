@@ -55,12 +55,13 @@ void setup()
   myLora.Setup();
   Serial.println();
   myLora.UpdateSettings(160, 10, 4);
+
   transmitting_thread.onRun(transmit);
   transmitting_thread.setInterval(1000);
   receiving_thread.onRun(receive);
   receiving_thread.setInterval(100);
-  control.add(&transmitting_thread); // & to pass the pointer to it
   control.add(&receiving_thread);    // & to pass the pointer to it
+  control.add(&transmitting_thread); // & to pass the pointer to it
 }
 
 void loop()
