@@ -3,7 +3,7 @@
 
 mySX1280 myLora;
 uint8_t message[] = "Aamir benches more than Kush";
-unsigned short int mode; // 0 is recieving and 1 is transmitting
+unsigned short int mode; // 0 is receiving and 1 is transmitting
 void setup()
 {
   Serial.begin(9600);
@@ -16,8 +16,8 @@ void setup()
       Serial.println(input_mode);
       if (input_mode == '0')
       {
-        Serial.println("\033[0;32mLora set to recieving mode\033[0m");
-        mode = 0; // recieving
+        Serial.println("\033[0;32mLora set to receiving mode\033[0m");
+        mode = 0; // receiving
         break;
       }
       else if (input_mode == '1')
@@ -31,15 +31,14 @@ void setup()
         Serial.println("Enter a mode (0=receiving, 1=transmitting): ");
       }
     }
-    
-  }
+    }
   Serial.println();
   myLora.Setup();
 }
 void loop()
 {
   if (mode == 0)
-  { // If Recieving
+  { // If Receiving
     myLora.Receive();
   }
   else if (mode == 1)
