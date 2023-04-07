@@ -68,6 +68,7 @@ void mySX1280::UpdateSettings(uint8_t new_spreading_factor, uint8_t new_bandwidt
 
 void mySX1280::Transmit(uint8_t message[], uint16_t message_size)
 {
+  Serial.print(F("TRANSMIT"));
   Serial.print(F("dBm:"));
   Serial.print(tx_power);
   Serial.print(F(";"));
@@ -79,7 +80,7 @@ void mySX1280::Transmit(uint8_t message[], uint16_t message_size)
   Serial.print(F(";"));
   digitalWrite(LED1, HIGH);
   start_ms = millis();
-  if (!lora.transmit(message, tx_packet_length, 10000, tx_power, WAIT_TX)) // will return packet length sent if OK, otherwise 0 if transmit, timeout 10 seconds
+  if (lora.transmit(message, tx_packet_length, 10000, tx_power, WAIT_TX)) // will return packet length sent if OK, otherwise 0 if transmit, timeout 10 seconds
   {
     end_ms = millis(); // packet sent, note end time
     tx_packet_count++;

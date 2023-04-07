@@ -38,7 +38,7 @@ def getComPort() -> str:
 
 class TransmissionMessage:
     def __init__(self, raw_msg: str):
-        msg_data_split = msg.split(";")
+        msg_data_split = raw_msg.split(";")
         msg_data_split = [data.split(":", 1) for data in msg_data_split]
         msg_data = {data[0]: data[1] for data in msg_data_split}
 
@@ -71,6 +71,9 @@ except serial.SerialException:
 while True:
     if ser.inWaiting() > 0:
         ser_input = ser.readline().decode("utf-8").strip()
-        t_msg = TransmissionMessage(ser_input)
-        print(t_msg)
+        if ser_input[:8] == 'TRANSMIT':
+            t_msg = TransmissionMessage(ser_input[8:])
+            print(t_msg)
+        else:
+            print(ser_input)
         time.sleep(0.5)
