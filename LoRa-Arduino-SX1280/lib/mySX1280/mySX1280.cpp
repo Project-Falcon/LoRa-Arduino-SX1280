@@ -68,19 +68,18 @@ void mySX1280::UpdateSettings(uint8_t new_spreading_factor, uint8_t new_bandwidt
 
 void mySX1280::Transmit(uint8_t message[], uint16_t message_size)
 {
+  Serial.print(F("dBm:"));
   Serial.print(tx_power);
-  Serial.print(F("dBm "));
-  Serial.print(F("Packet> "));
+  Serial.print(F(";"));
   Serial.flush();
-
+  Serial.print(F("Packet:"));
   tx_packet_length = message_size;
   message[tx_packet_length - 1] = '*'; // replace null character at buffer end so its visible on reciver
-
   lora.printASCIIPacket(message, tx_packet_length);
-
+  Serial.print(F(";"));
   digitalWrite(LED1, HIGH);
   start_ms = millis();
-  if (lora.transmit(message, tx_packet_length, 10000, tx_power, WAIT_TX)) // will return packet length sent if OK, otherwise 0 if transmit, timeout 10 seconds
+  if (!lora.transmit(message, tx_packet_length, 10000, tx_power, WAIT_TX)) // will return packet length sent if OK, otherwise 0 if transmit, timeout 10 seconds
   {
     end_ms = millis(); // packet sent, note end time
     tx_packet_count++;
@@ -99,28 +98,33 @@ void mySX1280::TransmitIsError()
 {
   uint16_t irq_status;
   irq_status = lora.readIrqStatus();
-  Serial.print(F(" SendError,"));
-  Serial.print(F("Length,"));
+  Serial.print(F("BytesSent:"));
   Serial.print(tx_packet_length);
-  Serial.print(F(",IRQreg,"));
+  Serial.print(F(";"));
+  Serial.print(F("IRQReg:"));
   Serial.print(irq_status, HEX);
-  lora.printIrqStatus();
+  Serial.print(F(";"));
+  PrintIrqStatus(irq_status);
+  Serial.print(F(";"));
+  Serial.print(F("Status:ERR"));
 }
 
 void mySX1280::TransmitIsOK()
 {
   uint16_t loral_crc;
 
-  Serial.print(F("  BytesSent,"));
+  Serial.print(F("BytesSent:"));
   Serial.print(tx_packet_length);
+  Serial.print(F(";"));
   loral_crc = lora.CRCCCITT(buff, tx_packet_length, 0xFFFF);
-  Serial.print(F("  CRC,"));
+  Serial.print(F("CRC:"));
   Serial.print(loral_crc, HEX);
-  Serial.print(F("  TransmitTime,"));
+  Serial.print(F(";"));
+  Serial.print(F("TransmitTime:"));
   Serial.print(end_ms - start_ms);
-  Serial.print(F("mS"));
-  Serial.print(F("  PacketsSent,"));
-  Serial.print(tx_packet_count);
+  Serial.print(F(";"));
+  Serial.print(F("Status:OK"));
+
 }
 
 void mySX1280::Receive()
@@ -223,4 +227,104 @@ void mySX1280::PrintElapsedTime()
   seconds = millis() / 1000;
   Serial.print(seconds, 0);
   Serial.print(F("s"));
+}
+
+void mySX1280::PrintIrqStatus(uint16_t irq_status)
+{
+  Serial.print(F("IRQStatus:"));
+  //0x0001
+  if (irq_status & IRQ_TX_DONE)
+  {
+    Serial.print(F("IRQ_TX_DONE"));
+  }
+
+  //0x0002
+  if (irq_status & IRQ_RX_DONE)
+  {
+    Serial.print(F("IRQ_RX_DONE"));
+  }
+
+  //0x0004
+  if (irq_status & IRQ_SYNCWORD_VALID)
+  {
+    Serial.print(F("IRQ_SYNCWORD_VALID"));
+  }
+
+  //0x0008
+  if (irq_status & IRQ_SYNCWORD_ERROR)
+  {
+    Serial.print(F("IRQ_SYNCWORD_ERROR"));
+  }
+
+  //0x0010
+  if (irq_status & IRQ_HEADER_VALID)
+  {
+    Serial.print(F("IRQ_HEADER_VALID"));
+  }
+
+  //0x0020
+  if (irq_status & IRQ_HEADER_ERROR)
+  {
+    Serial.print(F("IRQ_HEADER_ERROR"));
+  }
+
+  //0x0040
+  if (irq_status & IRQ_CRC_ERROR)
+  {
+    Serial.print(F("IRQ_CRC_ERROR"));
+  }
+
+  //0x0080
+  if (irq_status & IRQ_RANGING_SLAVE_RESPONSE_DONE)
+  {
+    Serial.print(F("IRQ_RANGING_SLAVE_RESPONSE_DONE"));
+  }
+
+  //0x0100
+  if (irq_status & IRQ_RANGING_SLAVE_REQUEST_DISCARDED)
+  {
+    Serial.print(F("IRQ_RANGING_SLAVE_REQUEST_DISCARDED"));
+  }
+
+  //0x0200
+  if (irq_status & IRQ_RANGING_MASTER_RESULT_VALID)
+  {
+    Serial.print(F("IRQ_RANGING_MASTER_RESULT_VALID"));
+  }
+
+  //0x0400
+  if (irq_status & IRQ_RANGING_MASTER_RESULT_TIMEOUT)
+  {
+    Serial.print(F("IRQ_RANGING_MASTER_RESULT_TIMEOUT"));
+  }
+
+  //0x0800
+  if (irq_status & IRQ_RANGING_SLAVE_REQUEST_VALID)
+  {
+    Serial.print(F("IRQ_RANGING_SLAVE_REQUEST_VALID"));
+  }
+
+  //0x1000
+  if (irq_status & IRQ_CAD_DONE)
+  {
+    Serial.print(F("IRQ_CAD_DONE"));
+  }
+
+  //0x2000
+  if (irq_status & IRQ_CAD_ACTIVITY_DETECTED)
+  {
+    Serial.print(F("IRQ_CAD_ACTIVITY_DETECTED"));
+  }
+
+  //0x4000
+  if (irq_status & IRQ_RX_TX_TIMEOUT)
+  {
+    Serial.print(F("IRQ_RX_TX_TIMEOUT"));
+  }
+
+  //0x8000
+  if (irq_status & IRQ_PREAMBLE_DETECTED)
+  {
+    Serial.print(F("IRQ_PREAMBLE_DETECTED"));
+  }
 }

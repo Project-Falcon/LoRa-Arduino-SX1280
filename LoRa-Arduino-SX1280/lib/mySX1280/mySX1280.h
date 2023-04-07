@@ -22,6 +22,7 @@ public:
 
   void LedFlash(uint8_t flashes, uint16_t delay_ms);
   void PrintElapsedTime();
+  void PrintIrqStatus(uint16_t irq_status);
 
 
 private:
