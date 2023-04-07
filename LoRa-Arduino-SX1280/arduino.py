@@ -36,7 +36,7 @@ def getComPort() -> str:
     return inp_port
 
 
-class TransmissionMessage:
+class TransmitMessage:
     def __init__(self, raw_msg: str):
         msg_data_split = raw_msg.split(";")
         msg_data_split = [data.split(":", 1) for data in msg_data_split]
@@ -54,7 +54,28 @@ class TransmissionMessage:
         self.irq_status = msg_data.get("IRQStatus")
 
     def __repr__(self):
-        return f"[{self.status}] msg: {self.msg}, transmit time: {self.transmit_time}"
+        return f"[TRANSMIT {self.status}] msg: {self.msg}, transmit time: {self.transmit_time}"
+
+
+class ReceiveMessage:
+    def __init__(self, raw_msg: str):
+        msg_data_split = raw_msg.split(";")
+        msg_data_split = [data.split(":", 1) for data in msg_data_split]
+        msg_data = {data[0]: data[1] for data in msg_data_split}
+
+        self.status = msg_data.get("Status")
+        self.msg = msg_data.get("Packet")
+        if self.msg:
+            self.msg = self.msg[:-1]
+        self.crc = msg_data.get("CRC")
+        self.rssi = msg_data.get("RSSI")
+        self.snr = msg_data.get("SNR")
+        self.bytes_sent = msg_data.get("BytesRec")
+        self.irq_reg = msg_data.get("IRQReg")
+        self.irq_status = msg_data.get("IRQStatus")
+
+    def __repr__(self):
+        return f"[RECEIVE {self.status}] msg: {self.msg}, RSSI: {self.rssi}, SNR: {self.snr}"
 
 
 try:
@@ -71,9 +92,12 @@ except serial.SerialException:
 while True:
     if ser.inWaiting() > 0:
         ser_input = ser.readline().decode("utf-8").strip()
-        if ser_input[:8] == 'TRANSMIT':
-            t_msg = TransmissionMessage(ser_input[8:])
+        if ser_input[:8] == "TRANSMIT":
+            t_msg = TransmitMessage(ser_input[8:])
             print(t_msg)
+        elif ser_input[:7] == "RECEIVE":
+            r_msg = ReceiveMessage(ser_input[7:])
+            print(r_msg)
         else:
             print(ser_input)
         time.sleep(0.5)
