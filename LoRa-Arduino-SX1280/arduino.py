@@ -4,6 +4,7 @@ import time
 import sys
 from colorama import Fore, Style
 
+
 def getComPort() -> str:
     while True:
         ports = list(list_ports.comports())
@@ -25,10 +26,13 @@ def getComPort() -> str:
 
     if sys.platform == "darwin":
         port_name = ports[inp_port].name
-        if port_name[:3] == 'cu.':
+        if port_name[:3] == "cu.":
             port_name = port_name[3:]
-            
+
         inp_port = f"/dev/tty.{port_name}"
+    else:
+        inp_port = ports[inp_port].name
+
     return inp_port
 
 
