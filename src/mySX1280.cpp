@@ -129,7 +129,7 @@ void mySX1280::TransmitIsOK()
 
 void mySX1280::Receive()
 {
-  rx_packet_length = lora.receive(rx_buffer, RXBUFFER_SIZE, 200, 0); // wait for a packet to arrive with 60seconds (60000mS) timeout
+  rx_packet_length = lora.receive(rx_buffer, RXBUFFER_SIZE, 200, 1); // wait for a packet to arrive with 60seconds (60000mS) timeout
 
   digitalWrite(LED1, HIGH);
 
