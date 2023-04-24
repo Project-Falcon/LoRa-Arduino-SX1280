@@ -68,18 +68,16 @@ void mySX1280::UpdateSettings(uint8_t new_spreading_factor, uint8_t new_bandwidt
 
 void mySX1280::Transmit(uint8_t message[], uint16_t message_size)
 {
-  // Serial.print(F("TRANSMIT"));
-  // Serial.print(F("dBm:"));
-  // Serial.print(tx_power);
-  // Serial.print(F(";"));
-  // Serial.flush();
-  // Serial.print(F("Packet:"));
+  Serial.print(F("TRANSMIT"));
+  Serial.print(F("dBm:"));
+  Serial.print(tx_power);
+  Serial.print(F(";"));
+  Serial.flush();
+  Serial.print(F("Packet:"));
   tx_packet_length = message_size;
   message[tx_packet_length - 1] = '*'; // replace null character at buffer end so its visible on reciver
-  // Serial.print(F(message));
-  Serial.print(F(tx_packet_length));
-  // lora.printASCIIPacket(message, tx_packet_length);
-  // Serial.print(F(";"));
+  lora.printASCIIPacket(message, tx_packet_length);
+  Serial.print(F(";"));
   digitalWrite(LED1, HIGH);
   start_ms = millis();
   if (lora.transmit(message, tx_packet_length, 200, tx_power, 0)) // will return packet length sent if OK, otherwise 0 if transmit, timeout 10 seconds
