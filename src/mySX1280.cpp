@@ -188,6 +188,9 @@ void mySX1280::ReceivePacketIsError()
   {
     // Serial.print(F(" RXTimeout"));
   }
+  else if (irq_status == 0x0001)
+  { // check if iqr status is set to only IRQ_TX_DONE
+  }
   else
   {
     Serial.print(F("RECEIVE"));
