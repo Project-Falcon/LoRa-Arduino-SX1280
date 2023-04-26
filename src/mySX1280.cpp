@@ -152,7 +152,13 @@ void mySX1280::Receive()
   }
   else
   {
-    ReceivePacketIsOK();
+    String str = (char *)rx_buffer;
+
+    // need to change to 8
+    if (str.substring(0, 3) != GetUID())
+    {
+      ReceivePacketIsOK();
+    }
   }
 
   digitalWrite(LED1, LOW);
