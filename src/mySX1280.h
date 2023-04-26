@@ -11,7 +11,7 @@ public:
 
   void Setup();
   void SetUID(String newUid);
-  char *GetUID();
+  String GetUID();
   void UpdateSettings(uint8_t new_spreading_factor, uint8_t new_bandwidth, uint8_t new_code_rate);
   void Transmit(uint8_t message[], uint16_t message_size);
   void TransmitIsOK();
@@ -28,7 +28,7 @@ public:
 private:
   SX128XLT lora;
 
-  char uid[8];
+  String uid;
   uint8_t tx_packet_length, rx_buffer[255], rx_packet_length, packet_snr;
   uint16_t packet_rssi;
   uint32_t tx_packet_count, rx_packet_count, start_ms, end_ms, error_count;

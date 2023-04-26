@@ -60,10 +60,10 @@ void mySX1280::Setup()
 
 void mySX1280::SetUID(String newUid)
 {
-  newUid.toCharArray(uid, newUid.length() + 1);
+  uid = newUid;
 }
 
-char *mySX1280::GetUID()
+String mySX1280::GetUID()
 {
   return uid;
 }
