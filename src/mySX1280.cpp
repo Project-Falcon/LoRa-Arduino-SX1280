@@ -56,17 +56,11 @@ void mySX1280::Setup()
   // Serial.print(F("Receiver ready - RXBUFFER_SIZE "));
   // Serial.println(RXBUFFER_SIZE);
   // Serial.println();
+}
 
-  // https://arduino.stackexchange.com/questions/86634/optimised-random-alphanumeric-string-generator
-  const int max_len = 8;
-  /* Change to allowable characters */
-  const char possible[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  for (int p = 0, i = 0; i < max_len; i++)
-  {
-    int r = random(0, strlen(possible));
-    uid[p++] = possible[r];
-  }
-  uid[max_len] = '\0';
+void mySX1280::SetUID(String newUid)
+{
+  newUid.toCharArray(uid, newUid.length() + 1);
 }
 
 char *mySX1280::GetUID()

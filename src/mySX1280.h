@@ -10,6 +10,7 @@ public:
   mySX1280();
 
   void Setup();
+  void SetUID(String newUid);
   char *GetUID();
   void UpdateSettings(uint8_t new_spreading_factor, uint8_t new_bandwidth, uint8_t new_code_rate);
   void Transmit(uint8_t message[], uint16_t message_size);
