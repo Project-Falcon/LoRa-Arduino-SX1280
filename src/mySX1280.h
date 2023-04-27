@@ -29,7 +29,7 @@ private:
   SX128XLT lora;
 
   String uid;
-  uint8_t tx_packet_length, rx_buffer[255], rx_packet_length, packet_snr;
+  uint8_t tx_packet_length, rx_buffer[511], rx_packet_length, packet_snr;
   uint16_t packet_rssi;
   uint32_t tx_packet_count, rx_packet_count, start_ms, end_ms, error_count;
 };

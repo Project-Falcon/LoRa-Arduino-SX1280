@@ -34,4 +34,4 @@ const uint8_t code_rate = LORA_CR_4_5;     // LoRa coding rate
 
 const int8_t tx_power = 10; // Power for transmissions in dBm
 
-#define RXBUFFER_SIZE 255 // RX buffer size
+#define RXBUFFER_SIZE 511 // RX buffer size
