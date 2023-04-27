@@ -155,7 +155,7 @@ void mySX1280::Receive()
     String str = (char *)rx_buffer;
 
     // need to change to 8
-    if (str.substring(0, 8) != GetUID())
+    if (str.substring(0, 4) != GetUID())
     {
       ReceivePacketIsOK();
     }
