@@ -21,11 +21,11 @@ public:
   void ReceivePacketIsOK();
   void ReceivePacketIsError();
 
-  void LedFlash(uint8_t flashes, uint16_t delay_ms, uint8_t led_number);
+  void LedFlash(int flashes, int delay_ms, int led_number);
   void PrintElapsedTime();
   void PrintIrqStatus(uint16_t irq_status);
 
-  void Buzzer(uint8_t frequency, uint16_t delay_ms);
+  void Buzzer(int frequency, uint16_t delay_ms);
 
 private:
   SX128XLT lora;

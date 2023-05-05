@@ -16,7 +16,7 @@
 #define RFBUSY 7
 #define NRESET 9
 #define LED1 8
-#define LED2 11
+#define LED2 6
 #define DIO1 3
 #define DIO2 -1   // not used
 #define DIO3 -1   // not used

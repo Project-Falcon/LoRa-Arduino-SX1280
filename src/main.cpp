@@ -14,8 +14,8 @@ void setup()
 
 void loop()
 {
-  tone(buzzer, 800);
-  delay(500);
-  noTone(buzzer);
-  delay(500);
+  // tone(buzzer, 800);
+  // delay(500);
+  // noTone(buzzer);
+  // delay(500);
 }
