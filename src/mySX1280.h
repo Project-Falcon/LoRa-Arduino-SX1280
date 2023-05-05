@@ -25,6 +25,8 @@ public:
   void PrintElapsedTime();
   void PrintIrqStatus(uint16_t irq_status);
 
+  void Buzzer(uint8_t frequency, uint16_t delay_ms);
+
 private:
   SX128XLT lora;
 

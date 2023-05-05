@@ -11,11 +11,10 @@ mySX1280::mySX1280() {}
 void mySX1280::Setup()
 {
   pinMode(LED1, OUTPUT);
-  pinMode(BUZZER,OUPUT);
+  pinMode(BUZZER, OUTPUT);
   pinMode(LED2, OUTPUT);
   LedFlash(2, 125);
-  Buzzer(275,200);
-
+  Buzzer(800, 200);
 
   Serial.begin(9600);
   Serial.println();
@@ -354,17 +353,18 @@ void mySX1280::PrintIrqStatus(uint16_t irq_status)
   }
 }
 
-void mySX1280::Buzzer (uint8_t frequency, uint16_t delay_ms){
- // Function for sounding the alarm
- tik = millis();
- while(millis()-tik < 400){
-   if(millis() - tik < delay_ms){
-     tone(BUZZER,frequency);
-   }
-   else{
-     noTone(BUZZER);
-   }
- }
-
-
+void mySX1280::Buzzer(uint8_t frequency, uint16_t delay_ms)
+{
+  unsigned long tik = millis();
+  while (millis() - tik < 400)
+  {
+    if (millis() - tik < delay_ms)
+    {
+      tone(BUZZER, frequency);
+    }
+    else
+    {
+      noTone(BUZZER);
+    }
+  }
 }
