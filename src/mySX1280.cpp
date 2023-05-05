@@ -11,12 +11,11 @@ mySX1280::mySX1280() {}
 void mySX1280::Setup()
 {
   pinMode(LED1, OUTPUT);
-  pinMode(BUZZER, OUTPUT);
   pinMode(LED2, OUTPUT);
+  pinMode(BUZZER, OUTPUT);
   Serial.println("SETUP");
-  LedFlash(2, 125, 2);
-  LedFlash(2, 125, 1);
-  Buzzer(800, 200);
+  LedFlash(2, 250, 3);
+  Buzzer(2, 800, 200);
 
   Serial.begin(9600);
   Serial.println();
@@ -33,8 +32,7 @@ void mySX1280::Setup()
   if (lora.begin(NSS, NRESET, RFBUSY, DIO1, DIO2, DIO3, RX_EN, TX_EN, LORA_DEVICE))
   {
     Serial.println(F("LoRa Device found"));
-    // LedFlash(2, 125, 1);
-    // LedFlash(2, 125, 2);
+    LedFlash(2, 250, 3);
     delay(1000);
   }
   else
@@ -42,19 +40,8 @@ void mySX1280::Setup()
     Serial.println(F("No device responding"));
     while (1)
     {
-      
-      // LedFlash(50, 50, 3); // long fast speed both LED flash indicates device error
-      digitalWrite(LED1, HIGH);
-      digitalWrite(LED2, HIGH);
-      Serial.println("ON");
-      // digitalWrite(LED1, HIGH);
-      delay(50);
-
-      Serial.println("OFF");
-      digitalWrite(LED1, LOW);
-      digitalWrite(LED2, HIGH);
-      // digitalWrite(LED1, LOW);
-      delay(50);
+      LedFlash(10, 100, 3); // long fast speed both LED flash indicates device error
+      Buzzer(2, 800, 250);
     }
   }
 
@@ -249,37 +236,6 @@ void mySX1280::ReceivePacketIsError()
   // delay(250);
 }
 
-void mySX1280::LedFlash(int flashes, int delay_ms, int led_number)
-{
-  for (uint8_t i = 0; i < flashes; i++)
-  {
-    if(led_number == 1 || led_number == 2){
-      if (led_number == 1)
-        digitalWrite(LED1, HIGH);
-      else if (led_number == 2)
-        digitalWrite(LED2, HIGH);
-      delay(delay_ms);
-
-      if (led_number == 1)
-        digitalWrite(LED1, LOW);
-      else if (led_number == 2)
-        digitalWrite(LED2, LOW);
-      delay(delay_ms);
-    }
-    
-    else if (led_number == 3){
-      Serial.println("LED BLINKING");
-      digitalWrite(LED1, HIGH);
-      digitalWrite(LED2, HIGH);
-      delay(500);
-
-      digitalWrite(LED1, LOW);
-      digitalWrite(LED2, LOW);
-      delay(500);
-    }
-  }
-}
-
 void mySX1280::PrintElapsedTime()
 {
   float seconds;
@@ -387,24 +343,53 @@ void mySX1280::PrintIrqStatus(uint16_t irq_status)
     Serial.print(F("IRQ_PREAMBLE_DETECTED,"));
   }
 }
-
-void mySX1280::Buzzer(int frequency, uint16_t delay_ms)
+void mySX1280::LedFlash(int flashes, int delay_ms, int led_number)
 {
-  // unsigned long tik = millis();
-  // while (millis() - tik < 400)
-  // {
-  //   if (millis() - tik < delay_ms)
-  //   {
-  //     tone(BUZZER, frequency);
-  //   }
-  //   else
-  //   {
-  //     noTone(BUZZER);
-  //   }
-  // }
-  Serial.println("BUZZING");
-  tone(BUZZER, frequency);
-  delay(delay_ms);
-  noTone(BUZZER);
-  delay(delay_ms);
+  for (uint8_t i = 0; i < flashes; i++)
+  {
+    if (led_number == 1 || led_number == 2)
+    {
+      if (led_number == 1)
+      {
+        digitalWrite(LED1, HIGH);
+      }
+      else if (led_number == 2)
+      {
+        digitalWrite(LED2, HIGH);
+      }
+      delay(delay_ms);
+
+      if (led_number == 1)
+      {
+        digitalWrite(LED1, LOW);
+      }
+      else if (led_number == 2)
+      {
+        digitalWrite(LED2, LOW);
+      }
+      delay(delay_ms);
+    }
+    else if (led_number == 3)
+    {
+      Serial.println("LED BLINKING");
+      digitalWrite(LED1, HIGH);
+      digitalWrite(LED2, HIGH);
+      delay(50);
+
+      digitalWrite(LED1, LOW);
+      digitalWrite(LED2, LOW);
+      delay(50);
+    }
+  }
+}
+
+void mySX1280::Buzzer(int buzzes, int frequency, uint16_t delay_ms)
+{
+  for (int i = 0; i < buzzes; i++)
+  {
+    tone(BUZZER, frequency);
+    delay(delay_ms);
+    noTone(BUZZER);
+    delay(delay_ms);
+  }
 }
