@@ -21,7 +21,7 @@ public:
   void ReceivePacketIsOK();
   void ReceivePacketIsError();
 
-  void LedFlash(uint8_t flashes, uint16_t delay_ms);
+  void LedFlash(uint8_t flashes, uint16_t delay_ms, uint8_t led_number);
   void PrintElapsedTime();
   void PrintIrqStatus(uint16_t irq_status);
 

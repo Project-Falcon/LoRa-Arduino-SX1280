@@ -13,7 +13,8 @@ void mySX1280::Setup()
   pinMode(LED1, OUTPUT);
   pinMode(BUZZER, OUTPUT);
   pinMode(LED2, OUTPUT);
-  LedFlash(2, 125);
+  LedFlash(2, 125, 1);
+  LedFlash(2, 125, 2);
   Buzzer(800, 200);
 
   Serial.begin(9600);
@@ -31,7 +32,8 @@ void mySX1280::Setup()
   if (lora.begin(NSS, NRESET, RFBUSY, DIO1, DIO2, DIO3, RX_EN, TX_EN, LORA_DEVICE))
   {
     Serial.println(F("LoRa Device found"));
-    LedFlash(2, 125);
+    LedFlash(2, 125, 1);
+    LedFlash(2, 125, 2);
     delay(1000);
   }
   else
@@ -39,7 +41,7 @@ void mySX1280::Setup()
     Serial.println(F("No device responding"));
     while (1)
     {
-      LedFlash(50, 50); // long fast speed LED flash indicates device error
+      LedFlash(50, 50, 1); // long fast speed LED flash indicates device error
     }
   }
 
@@ -234,13 +236,20 @@ void mySX1280::ReceivePacketIsError()
   // delay(250);
 }
 
-void mySX1280::LedFlash(uint8_t flashes, uint16_t delay_ms)
+void mySX1280::LedFlash(uint8_t flashes, uint16_t delay_ms, uint8_t led_number)
 {
   for (uint8_t i = 0; i < flashes; i++)
   {
-    digitalWrite(LED1, HIGH);
+    if (led_number == 1)
+      digitalWrite(LED1, HIGH);
+    else if (led_number == 2)
+      digitalWrite(LED2, HIGH);
     delay(delay_ms);
-    digitalWrite(LED1, LOW);
+
+    if (led_number == 1)
+      digitalWrite(LED1, HIGH);
+    else if (led_number == 2)
+      digitalWrite(LED2, HIGH);
     delay(delay_ms);
   }
 }
