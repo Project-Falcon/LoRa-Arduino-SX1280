@@ -371,7 +371,6 @@ void mySX1280::LedFlash(int flashes, int delay_ms, int led_number)
     }
     else if (led_number == 3)
     {
-      Serial.println("LED BLINKING");
       digitalWrite(TXLED, HIGH);
       digitalWrite(RXLED, HIGH);
       delay(50);
