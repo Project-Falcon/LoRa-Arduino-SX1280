@@ -13,7 +13,7 @@ void mySX1280::Setup()
   pinMode(TXLED, OUTPUT);
   pinMode(RXLED, OUTPUT);
   pinMode(BUZZER, OUTPUT);
-  Serial.println("SETUP");
+
   LedFlash(2, 250, 3);
   Buzzer(2, 800, 200);
 
