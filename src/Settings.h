@@ -15,7 +15,7 @@
 #define NSS 10
 #define RFBUSY 7
 #define NRESET 9
-#define TXLED 5
+#define TXLED 8
 #define RXLED 6
 #define DIO1 3
 #define DIO2 -1                   // not used
@@ -23,7 +23,7 @@
 #define RX_EN -1                  // pin for RX enable, used on some SX1280 devices, set to -1 if not used
 #define TX_EN -1                  // pin for TX enable, used on some SX1280 devices, set to -1 if not used
 #define BUZZER -1                 // pin for BUZZER, set to -1 if not used
-#define BUZZER 4                  // pin for BUZZER, set to -1 if not used
+#define BUZZER 5                  // pin for BUZZER, set to -1 if not used
 #define LORA_DEVICE DEVICE_SX1280 // we need to define the device we are using
 
 // LoRa Modem Parameters
