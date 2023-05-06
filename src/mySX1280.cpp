@@ -10,8 +10,8 @@ mySX1280::mySX1280() {}
 
 void mySX1280::Setup()
 {
-  pinMode(LED1, OUTPUT);
-  pinMode(LED2, OUTPUT);
+  pinMode(TXLED, OUTPUT);
+  pinMode(RXLED, OUTPUT);
   pinMode(BUZZER, OUTPUT);
   Serial.println("SETUP");
   LedFlash(2, 250, 3);
@@ -93,7 +93,7 @@ void mySX1280::Transmit(uint8_t message[], uint16_t message_size)
   message[tx_packet_length - 1] = '*'; // replace null character at buffer end so its visible on reciver
   lora.printASCIIPacket(message, tx_packet_length);
   Serial.print(F(";"));
-  digitalWrite(LED1, HIGH);
+  digitalWrite(TXLED, HIGH);
   start_ms = millis();
   if (lora.transmit(message, tx_packet_length, 200, tx_power, 0)) // will return packet length sent if OK, otherwise 0 if transmit, timeout 10 seconds
   {
@@ -106,7 +106,7 @@ void mySX1280::Transmit(uint8_t message[], uint16_t message_size)
     TransmitIsError(); // transmit packet returned 0, there was an error
   }
 
-  digitalWrite(LED1, LOW);
+  digitalWrite(TXLED, LOW);
   Serial.println();
 }
 
@@ -146,7 +146,7 @@ void mySX1280::Receive()
 {
   rx_packet_length = lora.receive(rx_buffer, RXBUFFER_SIZE, 300, 1); // wait for a packet to arrive with 60seconds (60000mS) timeout
 
-  digitalWrite(LED1, HIGH);
+  digitalWrite(RXLED, HIGH);
 
   packet_rssi = lora.readPacketRSSI();
   packet_snr = lora.readPacketSNR();
@@ -166,7 +166,7 @@ void mySX1280::Receive()
     }
   }
 
-  digitalWrite(LED1, LOW);
+  digitalWrite(RXLED, LOW);
 }
 
 void mySX1280::ReceivePacketIsOK()
@@ -351,33 +351,33 @@ void mySX1280::LedFlash(int flashes, int delay_ms, int led_number)
     {
       if (led_number == 1)
       {
-        digitalWrite(LED1, HIGH);
+        digitalWrite(TXLED, HIGH);
       }
       else if (led_number == 2)
       {
-        digitalWrite(LED2, HIGH);
+        digitalWrite(RXLED, HIGH);
       }
       delay(delay_ms);
 
       if (led_number == 1)
       {
-        digitalWrite(LED1, LOW);
+        digitalWrite(TXLED, LOW);
       }
       else if (led_number == 2)
       {
-        digitalWrite(LED2, LOW);
+        digitalWrite(RXLED, LOW);
       }
       delay(delay_ms);
     }
     else if (led_number == 3)
     {
       Serial.println("LED BLINKING");
-      digitalWrite(LED1, HIGH);
-      digitalWrite(LED2, HIGH);
+      digitalWrite(TXLED, HIGH);
+      digitalWrite(RXLED, HIGH);
       delay(50);
 
-      digitalWrite(LED1, LOW);
-      digitalWrite(LED2, LOW);
+      digitalWrite(TXLED, LOW);
+      digitalWrite(RXLED, LOW);
       delay(50);
     }
   }
