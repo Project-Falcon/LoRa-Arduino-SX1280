@@ -95,7 +95,7 @@ void mySX1280::Transmit(uint8_t message[], uint16_t message_size)
   Serial.print(F(";"));
   digitalWrite(TXLED, HIGH);
   start_ms = millis();
-  if (lora.transmit(message, tx_packet_length, 200, tx_power, 0)) // will return packet length sent if OK, otherwise 0 if transmit, timeout 10 seconds
+  if (lora.transmit(message, tx_packet_length, 200, tx_power, 1)) // will return packet length sent if OK, otherwise 0 if transmit, timeout 10 seconds
   {
     end_ms = millis(); // packet sent, note end time
     tx_packet_count++;
