@@ -236,6 +236,11 @@ void mySX1280::ReceivePacketIsError()
   // delay(250);
 }
 
+uint8_t mySX1280::GetSF()
+{
+  return lora.getLoRaSF();
+}
+
 void mySX1280::PrintElapsedTime()
 {
   float seconds;

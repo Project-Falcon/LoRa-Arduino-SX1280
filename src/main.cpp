@@ -13,7 +13,7 @@ void transmit(String message)
   String msg_inc_uid = myLora.GetUID() + "#" + message;
 
   uint8_t dataArray[msg_inc_uid.length() + 1];
-  msg_inc_uid.toCharArray((char*)dataArray, msg_inc_uid.length() + 1);
+  msg_inc_uid.toCharArray((char *)dataArray, msg_inc_uid.length() + 1);
 
   myLora.Transmit(dataArray, sizeof(dataArray));
 }
@@ -30,7 +30,7 @@ String getSplitStringValue(String data, char separator, int index)
     if (data.charAt(i) == separator || i == maxIndex)
     {
       found++;
-      strIndex[0] = strIndex[1] + 1; 
+      strIndex[0] = strIndex[1] + 1;
       strIndex[1] = (i == maxIndex) ? i + 1 : i;
     }
   }
@@ -126,11 +126,13 @@ void loop()
   while (Serial.available())
   {
     String data = Serial.readStringUntil('\n');
+    // is string == ?PW= then return power
+    // if string == !PW=5 then set power to 5
     transmit(data);
-    delay(100);
+    delay(25);
     break;
   }
 
   myLora.Receive();
-  delay(100);
+  delay(25);
 }

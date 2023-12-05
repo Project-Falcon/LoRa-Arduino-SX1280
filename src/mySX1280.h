@@ -21,6 +21,8 @@ public:
   void ReceivePacketIsOK();
   void ReceivePacketIsError();
 
+  uint8_t GetSF();
+
   void PrintElapsedTime();
   void PrintIrqStatus(uint16_t irq_status);
 
