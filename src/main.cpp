@@ -118,6 +118,17 @@ void setup()
   Serial.print(F("UID is: "));
   Serial.println(myLora.GetUID());
 
+  uint8_t SF = myLora.GetSF();
+  uint32_t BW = myLora.GetBW();
+  uint8_t CR = myLora.GetCR();
+
+  Serial.print(F("Spreading Factor: "));
+  Serial.println(SF);
+  Serial.print(F("Bandwidth: "));
+  Serial.println(BW);
+  Serial.print(F("Coding Rate: "));
+  Serial.println(CR);
+
   Serial.println(F("Ready"));
 }
 

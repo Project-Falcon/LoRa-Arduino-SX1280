@@ -22,6 +22,8 @@ public:
   void ReceivePacketIsError();
 
   uint8_t GetSF();
+  uint32_t GetBW();
+  uint8_t GetCR();
 
   void PrintElapsedTime();
   void PrintIrqStatus(uint16_t irq_status);
@@ -31,6 +33,7 @@ public:
 
 private:
   SX128XLT lora;
+  uint8_t sx_bandwidth;
 
   String uid;
   uint8_t tx_packet_length, rx_buffer[511], rx_packet_length, packet_snr;
