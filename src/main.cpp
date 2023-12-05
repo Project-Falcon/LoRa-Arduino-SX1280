@@ -100,6 +100,58 @@ void update_testcase()
   myLora.UpdateSettings(SF, BW, CR);
 }
 
+void sendSF() {
+  uint8_t SF = myLora.GetSF();
+  Serial.println(SF);
+}
+
+void sendBW() {
+  uint32_t BW = myLora.GetBW();
+  Serial.println(BW);
+}
+
+void sendCR() {
+  uint8_t CR = myLora.GetCR();
+  Serial.println(CR);
+}
+
+void setSF(uint8_t SF) {
+  myLora.UpdateSettings(SF, myLora.GetBW(), myLora.GetCR());
+}
+
+void setBW(long int BW) {
+  // Convert to actual BW
+  uint8_t coded_BW;
+  switch (BW)
+  {
+    case 203125:
+      coded_BW = 0x34;
+      break;
+
+    case 406250:
+      coded_BW = 0x26;
+      break;
+
+    case 812500:
+      coded_BW = 0x18;
+      break;
+
+    case 1625000:
+      coded_BW = 0x0A;
+      break;
+
+    default:
+      break;
+  }
+
+
+  myLora.UpdateSettings(myLora.GetSF(), coded_BW, myLora.GetCR());
+}
+
+void setCR(uint8_t CR) {
+  myLora.UpdateSettings(myLora.GetSF(), myLora.GetBW(), CR);
+}
+
 void setup()
 {
   Serial.begin(9600);
@@ -128,6 +180,12 @@ void setup()
   Serial.println(BW);
   Serial.print(F("Coding Rate: "));
   Serial.println(CR);
+
+  setBW(203125);
+
+  BW = myLora.GetBW();
+  Serial.print(F("Changed bandwidth: "));
+  Serial.println(BW);
 
   Serial.println(F("Ready"));
 }
