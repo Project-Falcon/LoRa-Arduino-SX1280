@@ -15,7 +15,7 @@ void mySX1280::Setup()
   pinMode(BUZZER, OUTPUT);
 
   LedFlash(2, 250, 3);
-  Buzzer(2, 800, 200);
+  // Buzzer(2, 800, 200);
 
   Serial.begin(9600);
   Serial.println();
