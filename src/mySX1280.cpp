@@ -27,7 +27,7 @@ void mySX1280::Setup()
   Serial.println(F("LoRa Starting"));
   Serial.println();
 
-  sx_bandwidth = bandwidth;
+  codedBW = bandwidth;
 
   SPI.begin();
 
@@ -77,7 +77,7 @@ String mySX1280::GetUID()
 
 void mySX1280::UpdateSettings(uint8_t new_spreading_factor, uint8_t new_bandwidth, uint8_t new_code_rate)
 {
-  sx_bandwidth = new_bandwidth;
+  codedBW = new_bandwidth;
   lora.setupLoRa(frequency, offset, new_spreading_factor, new_bandwidth, new_code_rate);
   Serial.println();
   lora.printModemSettings();
@@ -241,18 +241,32 @@ void mySX1280::ReceivePacketIsError()
 
 uint8_t mySX1280::GetSF()
 {
-  
+  // HUMAN READABLE version of SF (eg 5-12)
   return lora.getLoRaSF();
 }
 
 uint32_t mySX1280::GetBW()
 {
-  return lora.returnBandwidth(sx_bandwidth);
+  // HUMAN READABLE BW (eg in hz)
+  return lora.returnBandwidth(codedBW);
 }
 
 uint8_t mySX1280::GetCR()
 {
+  // HUMAN READABLE CR (eg 5 - 8)
   return lora.getLoRaCodingRate() + 4;  // For technical reasons
+}
+
+uint8_t mySX1280::GetCodedSF() {
+  return GetSF() << 4;
+}
+
+uint8_t mySX1280::GetCodedBW() {
+  return codedBW;
+}
+
+uint8_t mySX1280::GetCodedCR() {
+  return lora.getLoRaCodingRate();
 }
 
 void mySX1280::PrintElapsedTime()

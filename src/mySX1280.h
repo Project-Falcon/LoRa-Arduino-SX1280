@@ -25,6 +25,10 @@ public:
   uint32_t GetBW();
   uint8_t GetCR();
 
+  uint8_t GetCodedSF();
+  uint8_t GetCodedBW();
+  uint8_t GetCodedCR();
+
   void PrintElapsedTime();
   void PrintIrqStatus(uint16_t irq_status);
 
@@ -33,7 +37,7 @@ public:
 
 private:
   SX128XLT lora;
-  uint8_t sx_bandwidth;
+  uint8_t codedBW;
 
   String uid;
   uint8_t tx_packet_length, rx_buffer[511], rx_packet_length, packet_snr;

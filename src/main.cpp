@@ -109,17 +109,45 @@ void update_testcase()
 
 void sendSF() {
   uint8_t SF = myLora.GetSF();
-  Serial.println(SF);
+  Serial.println(SF);  // (Human readable)
 }
 
 void sendBW() {
   uint32_t BW = myLora.GetBW();
-  Serial.println(BW);
+  Serial.println(BW);  // (Human readable)
 }
 
 void sendCR() {
   uint8_t CR = myLora.GetCR();
-  Serial.println(CR);
+  Serial.println(CR);  // (Human readable)
+}
+
+int get_config() {
+  Serial.readBytesUntil('\n', cmd, DATA_BUFFER_SIZE);
+
+  if (strcmp(cmd, "SF") == 0) {
+        sendSF();
+        Serial.println("OK");
+
+    return 0;
+  }
+
+  if (strcmp(cmd, "BW") == 0) {
+        sendBW();
+        Serial.println("OK");
+
+    return 0;
+  }
+
+  if (strcmp(cmd, "CR") == 0) {
+        sendCR(); 
+        Serial.println("OK");
+    
+    return 0;
+  }
+
+    Serial.println("ERROR");
+  return -1;
 }
 
 int setSF(uint8_t SF) {
@@ -127,11 +155,11 @@ int setSF(uint8_t SF) {
     Serial.println("ERROR INVALID SF (5-12)");
     return -1;
   }
-
   // Convert to actual SF
   int SF_val = SF * 16;
 
-  myLora.UpdateSettings(SF_val, myLora.GetBW(), myLora.GetCR());
+  // Update settings expects the big representation of SF:
+  myLora.UpdateSettings(SF_val, myLora.GetCodedBW(), myLora.GetCodedCR());
 
   Serial.print("SET Spreading Factor: ");
   sendSF();
@@ -164,7 +192,8 @@ int setBW(long int BW) {
       return -1;
   }
 
-  myLora.UpdateSettings(myLora.GetSF(), coded_BW, myLora.GetCR());
+  // Update settings does not expect the human readable inputs
+  myLora.UpdateSettings(myLora.GetCodedBW(), coded_BW, myLora.GetCodedCR());
   Serial.print("SET BandWidth: ");
   sendBW();
 
@@ -172,7 +201,12 @@ int setBW(long int BW) {
 }
 
 int setCR(uint8_t CR) {
-  myLora.UpdateSettings(myLora.GetSF(), myLora.GetBW(), CR - 4);
+  if (CR < 5 || CR > 8) {
+    Serial.println("ERROR INVALID CR (4-8)");
+    return -1;
+  }
+
+  myLora.UpdateSettings(myLora.GetCodedSF(), myLora.GetCodedBW(), CR - 4);
 
   Serial.print("SET Coding Rate: ");
   sendCR();
@@ -186,7 +220,7 @@ int set_config() {
 
   float val = Serial.parseFloat();  // Get number after the =
 
-  // Do this?
+  // Do this
   Serial.readBytesUntil('\n', data, DATA_BUFFER_SIZE);
 
   // Switch case doesn't work for strings
@@ -237,23 +271,6 @@ void setup()
   Serial.print(F("UID is: "));
   Serial.println(myLora.GetUID());
 
-  uint8_t SF = myLora.GetSF();
-  uint32_t BW = myLora.GetBW();
-  uint8_t CR = myLora.GetCR();
-
-  Serial.print(F("Spreading Factor: "));
-  Serial.println(SF);
-  Serial.print(F("Bandwidth: "));
-  Serial.println(BW);
-  Serial.print(F("Coding Rate: "));
-  Serial.println(CR);
-
-  setBW(203125);
-
-  BW = myLora.GetBW();
-  Serial.print(F("Changed bandwidth: "));
-  Serial.println(BW);
-
   Serial.println(F("Ready"));
 }
 
@@ -265,7 +282,7 @@ int handle_command() {
 
     switch (c) {
         case '!': return set_config();
-        //case '?':  return get_config();
+        case '?':  return get_config();
         //case '+': return parse_packet();
         default: 
             String data = Serial.readStringUntil('\n');
@@ -277,23 +294,7 @@ int handle_command() {
 
 void loop()
 {
-  /*
-  while (Serial.available())
-  {
-    char command_type = Serial.read();
-    String command_detail = Serial.readStringUntil('=')
-    // is string == ?PW= then return power
-    // if string == !PW=5 then set power to 5
-    char first_char = data[0];
-    String command_content = data[1:];
-    Serial.println(first_char);
-
-    
-
-    transmit(data);
-    delay(25);
-    break;
-  }*/
+  // When theres stuff on the serial, go handle it.
   if (Serial.available() > 0) handle_command();
   
 
