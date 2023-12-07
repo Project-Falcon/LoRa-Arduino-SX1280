@@ -1,7 +1,12 @@
 #include <Arduino.h>
 #include <mySX1280.h>
 
+#define COMMAND_BUFFER_SIZE 8
+#define DATA_BUFFER_SIZE 256
+
 mySX1280 myLora;
+
+char cmd[COMMAND_BUFFER_SIZE], data[DATA_BUFFER_SIZE];
 
 void transmit(String message)
 {
@@ -16,6 +21,7 @@ void transmit(String message)
   msg_inc_uid.toCharArray((char *)dataArray, msg_inc_uid.length() + 1);
 
   myLora.Transmit(dataArray, sizeof(dataArray));
+  Serial.println(message);
 }
 
 // https://stackoverflow.com/questions/9072320/split-string-into-string-array
@@ -100,6 +106,7 @@ void update_testcase()
   myLora.UpdateSettings(SF, BW, CR);
 }
 
+
 void sendSF() {
   uint8_t SF = myLora.GetSF();
   Serial.println(SF);
@@ -115,11 +122,23 @@ void sendCR() {
   Serial.println(CR);
 }
 
-void setSF(uint8_t SF) {
-  myLora.UpdateSettings(SF, myLora.GetBW(), myLora.GetCR());
+int setSF(uint8_t SF) {
+  if (SF < 5 || SF > 12) {
+    Serial.println("ERROR INVALID SF (5-12)");
+    return -1;
+  }
+
+  // Convert to actual SF
+  int SF_val = SF * 16;
+
+  myLora.UpdateSettings(SF_val, myLora.GetBW(), myLora.GetCR());
+
+  Serial.print("SET Spreading Factor: ");
+  sendSF();
+  return 0;
 }
 
-void setBW(long int BW) {
+int setBW(long int BW) {
   // Convert to actual BW
   uint8_t coded_BW;
   switch (BW)
@@ -141,15 +160,63 @@ void setBW(long int BW) {
       break;
 
     default:
-      break;
+      Serial.println("ERROR INVALID BANDWIDTH");
+      return -1;
   }
 
-
   myLora.UpdateSettings(myLora.GetSF(), coded_BW, myLora.GetCR());
+  Serial.print("SET BandWidth: ");
+  sendBW();
+
+  return 0;
 }
 
-void setCR(uint8_t CR) {
-  myLora.UpdateSettings(myLora.GetSF(), myLora.GetBW(), CR);
+int setCR(uint8_t CR) {
+  myLora.UpdateSettings(myLora.GetSF(), myLora.GetBW(), CR - 4);
+
+  Serial.print("SET Coding Rate: ");
+  sendCR();
+
+  return 0;
+}
+
+int set_config() {
+  // Read command
+  Serial.readBytesUntil('=', cmd, COMMAND_BUFFER_SIZE);
+
+  float val = Serial.parseFloat();  // Get number after the =
+
+  // Do this?
+  Serial.readBytesUntil('\n', data, DATA_BUFFER_SIZE);
+
+  // Switch case doesn't work for strings
+  if (strcmp(cmd, "SF") == 0) {
+    setSF(val);
+
+        Serial.println("OK");
+
+    return 0;
+  }
+
+  if (strcmp(cmd, "BW") == 0) {
+    setBW(val);
+
+        Serial.println("OK");
+
+    return 0;
+  }
+
+  if (strcmp(cmd, "CR") == 0) {
+    setCR(val);
+        
+        Serial.println("OK");
+    
+    return 0;
+  }
+
+    Serial.println("ERROR");
+
+  return -1;
 }
 
 void setup()
@@ -190,17 +257,45 @@ void setup()
   Serial.println(F("Ready"));
 }
 
+int handle_command() {
+    memset(cmd, 0, COMMAND_BUFFER_SIZE);
+    memset(data, 0, DATA_BUFFER_SIZE);
+
+    char c = Serial.read();  // Read off the command type (eg !, ?, +)
+
+    switch (c) {
+        case '!': return set_config();
+        //case '?':  return get_config();
+        //case '+': return parse_packet();
+        default: 
+            String data = Serial.readStringUntil('\n');
+            transmit(c + data);  // Include the first character that was read off
+    }
+
+    return -1;
+};
+
 void loop()
 {
+  /*
   while (Serial.available())
   {
-    String data = Serial.readStringUntil('\n');
+    char command_type = Serial.read();
+    String command_detail = Serial.readStringUntil('=')
     // is string == ?PW= then return power
     // if string == !PW=5 then set power to 5
+    char first_char = data[0];
+    String command_content = data[1:];
+    Serial.println(first_char);
+
+    
+
     transmit(data);
     delay(25);
     break;
-  }
+  }*/
+  if (Serial.available() > 0) handle_command();
+  
 
   myLora.Receive();
   delay(25);
